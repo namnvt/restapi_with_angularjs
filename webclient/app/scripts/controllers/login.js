@@ -38,7 +38,7 @@ angular.module('webclientApp')
       $scope.login = function() {
 
         var payload = {
-          email : this.email,
+          username : this.username,
           password : this.password
         };
 
@@ -46,7 +46,7 @@ angular.module('webclientApp')
             .error(function(data, status){
               if(status === 400) {
                 angular.forEach(data, function(value, key) {
-                  if(key === 'email' || key === 'password') {
+                  if(key === 'username' || key === 'password') {
                     alertService.add('danger', key + ' : ' + value);
                   } else {
                     alertService.add('danger', value.message);

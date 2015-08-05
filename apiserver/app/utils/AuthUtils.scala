@@ -1,15 +1,18 @@
 package utils
 
-import controllers.Root._
+import controllers.Subscribers._
 import models.Subscriber
 import org.json4s._
 import org.json4s.ext.JodaTimeSerializers
+import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.mvc._
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsValue, JsObject, Json}
 import play.api.libs.ws.{WSResponse, WS}
+import play.api.libs.concurrent._
+import play.api.libs.iteratee._
 
+import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.Play.current
 import play.api.cache.Cache
 
@@ -162,6 +165,34 @@ def parseTokenFromCookie(implicit request: RequestHeader) = {
       optionalCredentialsTuple.map {
         sub => block(new AuthenticatedRequest(sub, request))
       } getOrElse Future.successful(Forbidden("Invalid User Credentials"))
+    }
+  }
+  def AuthenticatedWS(f: => String => Future[Either[Result, (Iteratee[JsValue, Unit], Enumerator[JsValue])]]): WebSocket[JsValue, JsValue] = {
+
+    // this function create an error Future[(Iteratee[JsValue, Unit], Enumerator[JsValue])])
+    // the iteratee ignore the input and do nothing,
+    // and the enumerator just send a 'not authorized message'
+    // and close the socket, sending Enumerator.eof
+    def errorFuture = {
+      // Just consume and ignore the input
+      val in = Iteratee.ignore[JsValue]
+
+      // Send a single 'Hello!' message and close
+      val out = Enumerator(Json.toJson("not authorized")).andThen(Enumerator.eof)
+
+      Future {
+        Left(Unauthorized)
+      }
+    }
+
+    WebSocket.tryAccept[JsValue] {
+      request =>
+        parseUserFromRequest(request) match {
+          case None =>
+            errorFuture
+          case Some(sub) =>
+            f(sub.username)
+        }
     }
   }
   object LogoutAction extends ActionBuilder[Request] {

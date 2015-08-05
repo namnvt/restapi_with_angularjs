@@ -5,13 +5,17 @@ import play.api.data._, Forms._, validation.Constraints._
 
 import org.json4s._, ext.JodaTimeSerializers, native.JsonMethods._
 import com.github.tototoshi.play2.json4s.native._
-
 import models._
+import actors.{Start, TimeActor}
+import akka.actor.Props
+import play.libs.Akka
+
 
 object Companies extends Controller with Json4s {
 
   implicit val formats = DefaultFormats ++ JodaTimeSerializers.all
-
+  val timeActor = Akka.system.actorOf(Props[TimeActor])
+  
   def all = Action {
     Ok(Extraction.decompose(Company.findAll))
   }
@@ -34,6 +38,8 @@ object Companies extends Controller with Json4s {
       formWithErrors => BadRequest("invalid parameters"),
       form => {
         val company = Company.create(name = form.name, url = form.url)
+        timeActor ! Start(company.id.toInt)
+        
         Created.withHeaders(LOCATION -> s"/companies/${company.id}")
         NoContent
       }

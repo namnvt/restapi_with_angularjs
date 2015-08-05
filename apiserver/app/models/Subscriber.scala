@@ -43,11 +43,14 @@ object Subscriber extends SQLSyntaxSupport[Subscriber] {
 
     Subscriber(id = id, username = username, email = email, password = password, createdAt = createdAt)
   }
-  
+  def findByUserAndPassword(username: String, password: String)(implicit session: DBSession = autoSession): Option[Subscriber] = withSQL {
+    select.from(Subscriber as sc).where.eq(sc.username, username).and.eq(sc.password, password).and.append(isNotDeleted)
+  }.map(Subscriber(sc)).single.apply()
+
   def save(m: Subscriber)(implicit session: DBSession = autoSession): Subscriber = {
     withSQL {
       update(Subscriber).set(
-        column.username -> m.username, 
+        column.username -> m.username,
         column.email -> m.email,
         column.password -> m.password
       ).where.eq(column.id, m.id).and.isNull(column.deletedAt)

@@ -4,7 +4,7 @@ lazy val root = (project in file("."))
   .settings(
     name := """apiserver""",
     version := "0.1",
-    scalaVersion := "2.11.4",
+    scalaVersion := "2.11.6",
     resolvers += "sonatype releases" at "http://oss.sonatype.org/content/repositories/releases",
     libraryDependencies ++= Seq(
       "org.scalikejdbc"      %% "scalikejdbc"                     % scalikejdbcVersion,
@@ -16,7 +16,13 @@ lazy val root = (project in file("."))
       "org.json4s"           %% "json4s-ext"                      % "3.2.11",
       "com.github.tototoshi" %% "play-json4s-native"              % "0.3.0",
       "com.github.tototoshi" %% "play-flyway"                     % "1.2.0",
-      "org.scalikejdbc"      %% "scalikejdbc-test"                % scalikejdbcVersion  % "test"
+      "org.scalikejdbc"      %% "scalikejdbc-test"                % scalikejdbcVersion  % "test",
+      "com.typesafe.akka"    %% "akka-actor"                      % akkaPlayVersion,
+      "com.typesafe.akka"    %% "akka-testkit"                    % akkaPlayVersion % "test",
+      "com.enragedginger"    %% "akka-quartz-scheduler"           % "1.3.0-akka-2.3.x",
+      jdbc,
+      cache,
+      ws
     ),
     initialCommands := """
       import scalikejdbc._, config._
@@ -31,5 +37,6 @@ lazy val root = (project in file("."))
 
 lazy val scalikejdbcVersion = "2.2.+"
 lazy val scalikejdbcPlayVersion = "2.3.+"
+lazy val akkaPlayVersion = "2.3.+"
 
 

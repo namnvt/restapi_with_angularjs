@@ -3,10 +3,9 @@ package matching
 import collection.mutable
 
 /**
- * Created with IntelliJ IDEA.
- * User: eprystupa
- * Date: 12/24/12
- * Time: 8:14 PM
+ * User: namnvt
+ * Date: 08/24/2015
+ * Time: 05:00 PM
  */
 
 class AdjustingEngine(buy: PostingBook, sell: PostingBook, postingHelpers: (Posting => PostingHelper))

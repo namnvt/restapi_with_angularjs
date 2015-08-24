@@ -1,11 +1,11 @@
 package matching
 
 /**
- * Created with IntelliJ IDEA.
- * User: eprystupa
- * Date: 1/2/13
- * Time: 9:37 PM
+ * User: namnvt
+ * Date: 08/24/2015
+ * Time: 05:00 PM
  */
+ 
 trait PostingHelper {
   def bookDisplay: String
 

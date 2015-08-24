@@ -1,10 +1,9 @@
 package matching
 
 /**
- * Created with IntelliJ IDEA.
- * User: eprystupa
- * Date: 12/22/12
- * Time: 11:03 PM
+ * User: namnvt
+ * Date: 08/24/2015
+ * Time: 05:00 PM
  */
 
 sealed trait AdjustEvent

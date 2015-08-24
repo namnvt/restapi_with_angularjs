@@ -2,10 +2,9 @@ package matching
 
 
 /**
- * Created with IntelliJ IDEA.
- * User: eprystupa
- * Date: 12/22/12
- * Time: 1:33 PM
+ * User: namnvt
+ * Date: 08/24/2015
+ * Time: 05:00 PM
  */
 
 class PostingBook(side: Side, postingHelpers: (Posting => PostingHelper)) {

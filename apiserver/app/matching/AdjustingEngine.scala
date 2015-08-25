@@ -18,7 +18,50 @@ class AdjustingEngine(buy: PostingBook, sell: PostingBook, postingHelpers: (Post
     unfilledOrder.foreach(book.add(_))
   }
 
+  def acceptPost(order: Posting) {
 
+    val (book, counterBook) = getBooks(order.side)
+    book.add(order)
+  }
+  def matchPredictAll () {
+    val totalBuy = buy.postings().map ( _.quantity ).sum
+    val totalSell = sell.postings().map ( _.quantity ).sum
+    val percentBuy = if (totalBuy >= totalSell)  100 else totalBuy/totalSell*100
+    val percentSell = if (totalSell >= totalBuy)  100 else totalSell/totalBuy*100
+    println ("Total Buy%:" + percentBuy)
+    println ("Total Sell%:" + percentSell)
+  }
+  
+  def matchPredictBuy() {
+    var buyPrices = buy.prices()
+    var sellPrices = sell.prices()
+    calcPercentMatch(buyPrices,sellPrices)
+    
+    def calcPercentMatch (bprices:List[(Double,Double)],sprices:List[(Double,Double)]) {
+        if (bprices.isEmpty) return
+        bprices.head match {
+          case (price,qty) => {
+            calcPercentMatch(bprices.tail, reduceMatched((price,qty), sprices))
+          }
+          case _ => println("1")
+        }
+    }
+    
+    def reduceMatched (b:(Double,Double), sprices:List[(Double,Double)]):List[(Double,Double)] = {
+      println("Reduce:"+ b +"List:"+ sprices)
+      sprices.head match {
+          case (price,qty) => {
+            if (b._1 >= price) {
+              if (b._2 == qty) sprices.tail
+              else if (b._2 > qty) reduceMatched((b._1,b._2-qty),sprices.tail) 
+              else (b._1,qty-b._2) :: sprices.tail
+            } else sprices
+          }
+          case _ => sprices
+      }
+    }
+  }
+  
   private def getBooks(side: Side): (PostingBook, PostingBook) = side match {
     case Buy => (buy, sell)
     case Sell => (sell, buy)
